@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>גלידות קרימי - משפחת אייזנברג</title>
+    
+    <!-- PWA & Mobile Meta Tags -->
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="קרימי משפחתי">
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --accent: #f59e0b;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Assistant', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            padding-bottom: 90px;
+            max-width: 600px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            padding: 20px;
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .header-title p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .cart-btn-head {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 10px 14px;
+            border-radius: 50px;
+            cursor: pointer;
+            position: relative;
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        .cart-badge {
+            background: var(--accent);
+            color: white;
+            font-size: 0.75rem;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        /* Tub Scaler Bar */
+        .scaler-bar {
+            background: var(--card-bg);
+            margin: 15px;
+            padding: 12px 16px;
+            border-radius: var(--radius);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border);
+        }
+
+        .scaler-title {
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .scaler-options {
+            display: flex;
+            gap: 6px;
+        }
+
+        .scale-btn {
+            border: 1px solid var(--border);
+            background: var(--bg);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .scale-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Recipe Feed */
+        .recipes-container {
+            padding: 0 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .recipe-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 18px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .card-title-group h2 {
+            font-size: 1.2rem;
+            font-weight: 800;
+        }
+
+        .macros-strip {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0 15px 0;
+            background: #f1f5f9;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .macro-item span {
+            color: var(--primary);
+            font-weight: 800;
+        }
+
+        /* Ingredients */
+        .section-label {
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+        }
+
+        .ingredients-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .ingredient-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 10px;
+            background: #fafafa;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .ing-btn {
+            background: #fee2e2;
+            color: #dc2626;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .ing-btn.in-cart {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        /* Preparation Steps */
+        .prep-steps {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        /* Ratings & Comments */
+        .ratings-section {
+            border-top: 1px dashed var(--border);
+            padding-top: 12px;
+        }
+
+        .stars-row {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 8px;
+            color: #cbd5e1;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+
+        .stars-row .active {
+            color: var(--accent);
+        }
+
+        .comment-input-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .comment-input-group input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .comment-input-group button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .comments-list {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .comment-bubble {
+            background: #f1f5f9;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+        }
+
+        /* Bottom Nav */
+        nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-width: 600px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+        }
+
+        /* Modal Shopping List */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .shopping-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .wa-btn {
+            background: #25d366;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 800;
+            margin-top: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-top">
+            <div class="header-title">
+                <h1>גלידות קרימי 🍦</h1>
+                <p>מתכוני דלוקס 709 מ"ל - משפחת אייזנברג</p>
+            </div>
+            <button class="cart-btn-head" onclick="openCart()">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <div class="cart-badge" id="cartBadge">0</div>
+            </button>
+        </div>
+    </header>
+
+    <!-- Tub Scaler Bar -->
+    <div class="scaler-bar">
+        <div class="scaler-title">
+            <i class="fa-solid fa-calculator" style="color:var(--primary)"></i>
+            מחשבון מכלים:
+        </div>
+        <div class="scaler-options">
+            <button class="scale-btn active" onclick="setScale(1, this)">1</button>
+            <button class="scale-btn" onclick="setScale(1.5, this)">1.5</button>
+            <button class="scale-btn" onclick="setScale(2, this)">2</button>
+            <button class="scale-btn" onclick="setScale(3, this)">3</button>
+        </div>
+    </div>
+
+    <!-- Main Content Tabs -->
+    <div id="recipesTab">
+        <div class="recipes-container" id="recipesContainer"></div>
+    </div>
+
+    <div id="tipsTab" style="display:none; padding:15px;">
+        <div class="recipe-card">
+            <h2>💡 טיפים לתוצאה מושלמת</h2>
+            <br>
+            <p><strong>1. הקפאה ישרה:</strong> תמיד להקפיא את המכל על משטח ישר לחלוטין ל-24 שעות.</p><br>
+            <p><strong>2. טיפול בפירורים:</strong> אם המרקם יוצא פירורי לאחר הסיבוב הראשון, מוסיפים 1-2 כפות חלב ומפעילים על <strong>Re-spin</strong>.</p><br>
+            <p><strong>3. אחסון שאריות:</strong> מיישרים את פני הגלידה שנתררה בעזרת כף, מקפיאים שוב, וכשרוצים לאכול מוסיפים כף חלב ומפעילים direct על <strong>Re-spin</strong>.</p>
+        </div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav>
+        <button class="nav-item active" onclick="switchTab('recipes', this)">
+            <i class="fa-solid fa-ice-cream"></i>
+            מתכונים
+        </button>
+        <button class="nav-item" onclick="openCart()">
+            <i class="fa-solid fa-cart-shopping"></i>
+            קניות
+        </button>
+        <button class="nav-item" onclick="switchTab('tips', this)">
+            <i class="fa-solid fa-lightbulb"></i>
+            טיפים
+        </button>
+    </nav>
+
+    <!-- Modal Shopping List -->
+    <div class="modal" id="cartModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🛒 רשימת קניות משפחתית</h2>
+                <button class="close-btn" onclick="closeCart()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="cartItemsList"></div>
+            <button class="wa-btn" onclick="shareWhatsApp()">
+                <i class="fa-brands fa-whatsapp"></i> שליחה ב-WhatsApp
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Data & State
+        let currentScale = 1;
+        let cart = JSON.parse(localStorage.getItem('creami_cart') || '[]');
+        let reviews = JSON.parse(localStorage.getItem('creami_reviews') || '{}');
+
+        const recipes = [
+            {
+                id: 1,
+                name: "גלידת מנגו חלבונית (אקסטרה מנגו)",
+                cal: 600, fat: 31.5, fatPct: 4.7, protein: 21.5,
+                ingredients: [
+                    { name: "יוגורט יווני 10% שומן", qty: 300, unit: "גרם" },
+                    { name: "מנגו (טרי או קפוא)", qty: 350, unit: "גרם" },
+                    { name: "אבקת אלולוז", qty: 3, unit: "כפות" },
+                    { name: "אבקת קסנטן גאם", qty: 0.33, unit: "כפית" },
+                    { name: "חלב 3%", qty: 1.5, unit: "כפות" }
+                ],
+                prep: "טוחנים בבלנדר מוט ישירות במכל. מקפיאים ל-24 שעות ומעבדים ב-Lite Ice Cream."
+            },
+            {
+                id: 2,
+                name: "גלידת קפה וקרמל",
+                cal: 378, fat: 30, fatPct: 8.5, protein: 18,
+                ingredients: [
+                    { name: "יוגורט יווני 10% שומן", qty: 300, unit: "גרם" },
+                    { name: "אספרסו ממקינטה (מקורר)", qty: 1.5, unit: "מנות" },
+                    { name: "אבקת אלולוז", qty: 3.5, unit: "כפות" },
+                    { name: "סירופ קרמל ללא סוכר", qty: 3, unit: "כפות" },
+                    { name: "אבקת גוואר גאם", qty: 0.33, unit: "כפית" }
+                ],
+                prep: "טוחנים בבלנדר מוט, מקפיאים ל-24 שעות ומעבדים ב-Lite Ice Cream."
+            },
+            {
+                id: 3,
+                name: "גלידת מאצ'ה יפנית",
+                cal: 486, fat: 35.4, fatPct: 7.3, protein: 24,
+                ingredients: [
+                    { name: "יוגורט יווני 10% שומן", qty: 300, unit: "גרם" },
+                    { name: "אבקת מאצ'ה", qty: 2, unit: "כפיות" },
+                    { name: "חלב 3%", qty: 0.75, unit: "כוס" },
+                    { name: "אבקת אלולוז", qty: 4.5, unit: "כפות" },
+                    { name: "אבקת קסנטן גאם", qty: 0.33, unit: "כפית" }
+                ],
+                prep: "ערבוב יסודי בבלנדר מוט, הקפאה ל-24 שעות ועיבוד ב-Lite Ice Cream."
+            },
+            {
+                id: 4,
+                name: "גלידת מנגו-צ'ילי",
+                cal: 600, fat: 31.5, fatPct: 4.7, protein: 21.5,
+                ingredients: [
+                    { name: "יוגורט יווני 10% שומן", qty: 300, unit: "גרם" },
+                    { name: "מנגו (
