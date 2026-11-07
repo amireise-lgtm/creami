@@ -474,10 +474,31 @@
     </div>
 
     <script>
-        // Data & State
+        // Data & State - BULLETPROOF VERSION
         let currentScale = 1;
-        let cart = JSON.parse(localStorage.getItem('creami_cart') || '[]');
-        let reviews = JSON.parse(localStorage.getItem('creami_reviews') || '{}');
+        let cart = [];
+        let reviews = {};
+
+        // מנגנון הגנה חסין תקלות לאתחול הזיכרון
+        try {
+            const savedCart = localStorage.getItem('creami_cart');
+            if (savedCart) cart = JSON.parse(savedCart);
+            
+            const savedReviews = localStorage.getItem('creami_reviews');
+            if (savedReviews) reviews = JSON.parse(savedReviews);
+        } catch (e) {
+            console.warn("Storage blocked by WebView or corrupted data", e);
+            cart = [];
+            reviews = {};
+        }
+
+        // פונקציות שמירה מאובטחות
+        function saveCart() {
+            try { localStorage.setItem('creami_cart', JSON.stringify(cart)); } catch(e){}
+        }
+        function saveReviews() {
+            try { localStorage.setItem('creami_reviews', JSON.stringify(reviews)); } catch(e){}
+        }
 
         const recipes = [
             {
@@ -525,4 +546,207 @@
                 cal: 600, fat: 31.5, fatPct: 4.7, protein: 21.5,
                 ingredients: [
                     { name: "יוגורט יווני 10% שומן", qty: 300, unit: "גרם" },
-                    { name: "מנגו (
+                    { name: "מנגו (טרי או קפוא)", qty: 350, unit: "גרם" },
+                    { name: "אבקת אלולוז", qty: 3, unit: "כפות" },
+                    { name: "אבקת קסנטן גאם", qty: 0.33, unit: "כפית" },
+                    { name: "פלפל קאיין טחון", qty: 0.25, unit: "כפית" },
+                    { name: "מיץ לימון טרי", qty: 1.5, unit: "כפות" },
+                    { name: "חלב 3%", qty: 1.5, unit: "כפות" }
+                ],
+                prep: "טחינה בבלנדר מוט במכל, הקפאה ל-24 שעות ועיבוד ב-Lite Ice Cream."
+            },
+            {
+                id: 5,
+                name: "גלידת קרמל מלוח-חריף",
+                cal: 486, fat: 35.4, fatPct: 7.3, protein: 24,
+                ingredients: [
+                    { name: "יוגורט יווני 10% שומן", qty: 300, unit: "גרם" },
+                    { name: "חלב 3%", qty: 0.75, unit: "כוס" },
+                    { name: "אבקת אלולוז", qty: 3, unit: "כפות" },
+                    { name: "סירופ קרמל ללא סוכר", qty: 3, unit: "כפות" },
+                    { name: "אבקת גוואר גאם", qty: 0.33, unit: "כפית" },
+                    { name: "מלח ים", qty: 0.25, unit: "כפית" },
+                    { name: "פלפל חריף טחון", qty: 0.25, unit: "כפית" }
+                ],
+                prep: "טחינה בבלנדר מוט במכל, הקפאה ל-24 שעות ועיבוד ב-Lite Ice Cream."
+            },
+            {
+                id: 6,
+                name: "גלידת קרמל מלוח קלאסית",
+                cal: 485, fat: 35, fatPct: 7.3, protein: 24,
+                ingredients: [
+                    { name: "יוגורט יווני 10% שומן", qty: 300, unit: "גרם" },
+                    { name: "חלב 3%", qty: 0.75, unit: "כוס" },
+                    { name: "אבקת אלולוז", qty: 3, unit: "כפות" },
+                    { name: "סירופ קרמל ללא סוכר", qty: 4, unit: "כפות" },
+                    { name: "אבקת גוואר גאם", qty: 0.33, unit: "כפית" },
+                    { name: "מלח ים", qty: 0.5, unit: "כפית" }
+                ],
+                prep: "טחינה בבלנדר מוט במכל, הקפאה ל-24 שעות ועיבוד ב-Lite Ice Cream."
+            },
+            {
+                id: 7,
+                name: "גלידת קרמל מלוח עם קרמל ביתי (סוכר טבעי)",
+                cal: 770, fat: 35.5, fatPct: 6.2, protein: 26,
+                ingredients: [
+                    { name: "יוגורט יווני 10% שומן", qty: 300, unit: "גרם" },
+                    { name: "חלב 3%", qty: 0.75, unit: "כוס" },
+                    { name: "סוכר לבן (לקרמל)", qty: 0.5, unit: "כוס" },
+                    { name: "חמאה", qty: 25, unit: "גרם" },
+                    { name: "אבקת גוואר גאם", qty: 0.33, unit: "כפית" },
+                    { name: "מלח ים", qty: 0.5, unit: "כפית" }
+                ],
+                prep: "מקרמלים בסיר סוכר, חמאה ושמנת. מוסיפים 4 כפות ליוגורט ולחלב, טוחנים, מקפיאים 24 שעות ומעבדים ב-Ice Cream."
+            }
+        ];
+
+        // Functions
+        function renderRecipes() {
+            const container = document.getElementById('recipesContainer');
+            if(!container) return;
+            
+            container.innerHTML = recipes.map(r => {
+                const scaledCal = Math.round(r.cal * currentScale);
+                const scaledFat = Math.round(r.fat * currentScale);
+                const scaledProtein = Math.round(r.protein * currentScale);
+                
+                // הגנה מפני נתונים ישנים או פגומים
+                let rReviews = reviews[r.id];
+                if (!rReviews || typeof rReviews !== 'object' || !Array.isArray(rReviews.comments)) {
+                    rReviews = { rating: 5, comments: [] };
+                }
+
+                return `
+                <div class="recipe-card">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <h2>${r.name}</h2>
+                        </div>
+                    </div>
+
+                    <div class="macros-strip">
+                        <div class="macro-item">קלוריות: <span>${scaledCal}</span></div>
+                        <div class="macro-item">חלבון: <span>${scaledProtein}ג'</span></div>
+                        <div class="macro-item">שומן בתערובת: <span>${r.fatPct}%</span> (${scaledFat}ג')</div>
+                    </div>
+
+                    <div class="section-label">מרכיבים (${currentScale} מכלים):</div>
+                    <ul class="ingredients-list">
+                        ${r.ingredients.map(ing => {
+                            const val = (ing.qty * currentScale).toFixed(1).replace('.0', '');
+                            const itemKey = `${ing.name}`;
+                            const isInCart = cart.includes(itemKey);
+                            return `
+                            <li class="ingredient-item">
+                                <span><strong>${val} ${ing.unit}</strong> ${ing.name}</span>
+                                <button class="ing-btn ${isInCart ? 'in-cart' : ''}" onclick="toggleCart('${itemKey}')">
+                                    ${isInCart ? '✓ ברשימה' : '+ חסר בבית'}
+                                </button>
+                            </li>`;
+                        }).join('')}
+                    </ul>
+
+                    <div class="section-label">הוראות הכנה:</div>
+                    <div class="prep-steps">${r.prep}</div>
+
+                    <div class="ratings-section">
+                        <div class="section-label">דירוג וביקורת משפחתית:</div>
+                        <div class="stars-row">
+                            ${[1,2,3,4,5].map(star => `
+                                <i class="fa-solid fa-star ${star <= rReviews.rating ? 'active' : ''}" onclick="rateRecipe(${r.id}, ${star})"></i>
+                            `).join('')}
+                        </div>
+                        <div class="comment-input-group">
+                            <input type="text" id="comment_${r.id}" placeholder="הוסף הערת שיפור/מרקם...">
+                            <button onclick="addComment(${r.id})">שלח</button>
+                        </div>
+                        <div class="comments-list">
+                            ${rReviews.comments.map(c => `<div class="comment-bubble">💬 ${c}</div>`).join('')}
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+            
+            updateCartBadge();
+        }
+
+        function setScale(scale, btn) {
+            currentScale = scale;
+            document.querySelectorAll('.scale-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderRecipes();
+        }
+
+        function toggleCart(item) {
+            const idx = cart.indexOf(item);
+            if (idx > -1) cart.splice(idx, 1);
+            else cart.push(item);
+            saveCart();
+            renderRecipes();
+        }
+
+        function updateCartBadge() {
+            const badge = document.getElementById('cartBadge');
+            if(badge) badge.innerText = cart.length;
+        }
+
+        function openCart() {
+            const listContainer = document.getElementById('cartItemsList');
+            if (!listContainer) return;
+            
+            if (cart.length === 0) {
+                listContainer.innerHTML = '<p style="text-align:center; padding:20px; color:var(--text-muted);">הרשימה ריקה! כל המרכיבים קיימים בבית.</p>';
+            } else {
+                listContainer.innerHTML = cart.map(item => `
+                    <div class="shopping-item">
+                        <span>• ${item}</span>
+                        <button class="ing-btn" onclick="toggleCart('${item}'); openCart();">הסר</button>
+                    </div>
+                `).join('');
+            }
+            document.getElementById('cartModal').style.display = 'flex';
+        }
+
+        function closeCart() {
+            document.getElementById('cartModal').style.display = 'none';
+        }
+
+        function shareWhatsApp() {
+            if (cart.length === 0) return alert('הרשימה ריקה!');
+            const text = "🛒 *רשימת קניות לגלידות קרימי:*\n\n" + cart.map(i => `• ${i}`).join('\n');
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+        }
+
+        function rateRecipe(id, rating) {
+            if (!reviews[id] || typeof reviews[id] !== 'object') reviews[id] = { rating: 5, comments: [] };
+            reviews[id].rating = rating;
+            saveReviews();
+            renderRecipes();
+        }
+
+        function addComment(id) {
+            const input = document.getElementById(`comment_${id}`);
+            if (!input || !input.value.trim()) return;
+            
+            if (!reviews[id] || typeof reviews[id] !== 'object' || !Array.isArray(reviews[id].comments)) {
+                reviews[id] = { rating: 5, comments: [] };
+            }
+            
+            reviews[id].comments.push(input.value.trim());
+            saveReviews();
+            input.value = '';
+            renderRecipes();
+        }
+
+        function switchTab(tab, btn) {
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('recipesTab').style.display = tab === 'recipes' ? 'block' : 'none';
+            document.getElementById('tipsTab').style.display = tab === 'tips' ? 'block' : 'none';
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', renderRecipes);
+    </script>
+</body>
+</html>
